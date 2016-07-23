@@ -1,0 +1,39 @@
+首先让我们了解几个概念：
+栈 ：由JVM分配区域，用于保存线程执行的动作和数据引用。
+堆 ：由JVM分配的，用于存储对象等数据的区域。
+常量池constant pool ：在堆中分配出来的一块存储区域，用于存储显式 的String，float或者integer.这是一个特殊的共享区域，可以在内存中共享的不经常改变的东西，都可以放在这里。
+进入正题：
+String a = "abc";①
+String b = "abc";②
+使用String a = "abc"；的方式，可以在一定程度上提高程序的运行速度，因为JVM会自动根据栈中数据的实际情况来决定是否有必要创建新对象。
+①代码执行后在Constant Pool中创建了一个值为abc的String对象，②执行时，因为Constant Pool中存在"abc"所以就不在创建新的String对象了。
+String   c   =   new   String("xyz");①
+String   d   =   new   String("xyz");②
+让我们来看看这两句代码在内存中发生了什么，①Class被CLassLoader加载时，你的"xyz"被作为常量读入，在constant   pool里创建了一个共享的"xyz"，然后当调用到new   String("xyz")的时候，会在heap里创建这个new   String("xyz");②由于constant   pool中存在"xyz"所以不再创建"xyz"，然后创建新的new   String("xyz")。
+对于String c = new String("xyz")；的代码，与String a = "abc"不同的是一概在堆中创建新对象，不管其字符串值是否相等，是否有必要创建新对象，从而加重了程序的负担。 
+程序1
+String   s1   =   new   String("xyz");     //创建二个对象，一个引用 
+String   s2   =   new   String("xyz");     //创建一个对象，并且以后每执行一次创建一个对象，一个引用 
+程序2 
+String   s3   =   "xyz";     //创建一个对象，一个引用   
+String   s4   =   "xyz";     //不创建对象，只是创建一个新的引用
+重要的是理解constant pool与new关键字
+当调用 intern 方法时，如果池已经包含一个等于此 String 对象的字符串（该对象由 equals(Object) 方法确定），则返回池中的字符串。否则，将此 String 对象添加到池中，并且返回此 String 对象的引用。(无论怎样都返回池中的对象)
+下面的这个例子能帮助我们更深入的理解String的存储和赋值原理
+String str1 = new String("123");
+        String str2 = "123";
+        
+        String str3 = str1.intern();
+        
+        System.out.println((str1 == str2) +","+ (str3 == str2));
+        输出 false,true
+                
+        String str4 = new String("234");
+        String str5 = new String("234");
+        
+        String str6 = str4.intern();
+        String str7 = str5.intern();
+        
+        
+        System.out.println((str4 == str5) +","+ (str6 == str7));
+        输出 false,true
